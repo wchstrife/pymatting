@@ -31,3 +31,5 @@ benchmarks/*.zip
 benchmakrs/Eigen/
 benchmarks/images/
 benchmarks/results/
+
+data/

@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import os
 import traceback
+from PIL import Image
 
 def generate_show_fg():
     '''
@@ -26,6 +27,23 @@ def generate_show_fg():
     images = [image, alpha, foreground, new_image]
     grid = make_grid(images)
     save_image("results/caterpillar-205204_1920_fast.png", grid)
+
+def generate_show_raw_image():
+    '''
+    直接根据img合成图片,跟重新估计前景的对比
+    '''
+    image = load_image("data/test/fg/caterpillar-205204_1920.jpg", "RGB")
+    alpha = load_image("data/test/alpha/caterpillar-205204_1920.jpg", "GRAY")
+    image = cv2.resize(image, (320,320))
+    alpha = cv2.resize(alpha, (320,320))
+    bg_new = load_image("data/test/bg/organ_bg.png", size=[alpha.shape[1], alpha.shape[0]] , mode="RGB") 
+
+    foreground = estimate_foreground_ml(image, alpha, return_background=False)
+    new_image = blend(foreground, bg_new, alpha)
+    old_image = blend(image, bg_new, alpha)
+    images = [image, alpha, old_image, new_image]
+    grid = make_grid(images)
+    save_image("results/caterpillar-205204_1920_raw.png", grid)
 
 def generate_bg():
     '''
@@ -66,20 +84,22 @@ def process_adobe_dataset(img_dir, alpha_dir, save_dir):
 
 
 if __name__ == "__main__":
-    print('------------process adobe test-----------------')
-    img_dir = 'data/Combined_Dataset/Test_set/Adobe-licensed images/fg'
-    alpha_dir = 'data/Combined_Dataset/Test_set/Adobe-licensed images/alpha'
-    save_dir = 'results/adobe_test'
-    process_adobe_dataset(img_dir, alpha_dir, save_dir)
+    # print('------------process adobe test-----------------')
+    # img_dir = 'data/Combined_Dataset/Test_set/Adobe-licensed images/fg'
+    # alpha_dir = 'data/Combined_Dataset/Test_set/Adobe-licensed images/alpha'
+    # save_dir = 'results/adobe_test'
+    # process_adobe_dataset(img_dir, alpha_dir, save_dir)
 
-    print('------------process adobe train Adobe-licensed Image-----------------')
-    img_dir = 'data/Combined_Dataset/Training_set/Adobe-licensed images/fg'
-    alpha_dir = 'data/Combined_Dataset/Training_set/Adobe-licensed images/alpha'
-    save_dir = 'results/adobe_train_adobe'
-    process_adobe_dataset(img_dir, alpha_dir, save_dir)
+    # print('------------process adobe train Adobe-licensed Image-----------------')
+    # img_dir = 'data/Combined_Dataset/Training_set/Adobe-licensed images/fg'
+    # alpha_dir = 'data/Combined_Dataset/Training_set/Adobe-licensed images/alpha'
+    # save_dir = 'results/adobe_train_adobe'
+    # process_adobe_dataset(img_dir, alpha_dir, save_dir)
 
-    print('------------process adobe train Others Image-----------------')
-    img_dir = 'data/Combined_Dataset/Training_set/Other/fg'
-    alpha_dir = 'data/Combined_Dataset/Training_set/Other/alpha'
-    save_dir = 'results/adobe_train_others'
-    process_adobe_dataset(img_dir, alpha_dir, save_dir)
+    # print('------------process adobe train Others Image-----------------')
+    # img_dir = 'data/Combined_Dataset/Training_set/Other/fg'
+    # alpha_dir = 'data/Combined_Dataset/Training_set/Other/alpha'
+    # save_dir = 'results/adobe_train_others'
+    # process_adobe_dataset(img_dir, alpha_dir, save_dir)
+
+    # generate_show_raw_image()
